@@ -233,35 +233,103 @@ if view == "Painel da médica":
             st.info("A fila está vazia. Adicione um paciente para começar.")
         st.markdown('</div>', unsafe_allow_html=True)
 
+
 elif view == "Tela da recepção / TV":
-    st_autorefresh(interval=2500, key="tv_auto_refresh")
-    current = get_current()
-    waiting = get_waiting()
-    st.markdown('<div class="panel" style="text-align:center;padding:36px 24px"><div class="kicker">Atenção • Próximo atendimento</div>', unsafe_allow_html=True)
-    if current:
-        st.markdown(f'<div class="big-name" style="margin-top:20px">{html.escape(current["patient_name"])}</div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="big-reg">Matrícula: <b>{html.escape(current["registration"])}</b></div>', unsafe_allow_html=True)
-        st.markdown(f'<div style="display:inline-block;margin-top:20px;background:#e8f4ff;color:#15517b;border-radius:999px;padding:12px 22px;font-size:20px;font-weight:800">➡️ {html.escape(current["room"])}</div>', unsafe_allow_html=True)
-        st.markdown(f'<p class="muted" style="margin-top:18px">Chamado às {html.escape(current["called_at"] or "—")}</p>', unsafe_allow_html=True)
-        sound_widget(current["id"], current["patient_name"], current["registration"], current["room"])
-    else:
-        st.markdown('<div class="big-name" style="margin-top:24px">Aguardando chamada…</div><p class="muted">O próximo paciente aparecerá aqui.</p>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-    c1,c2,c3 = st.columns(3)
-    with c1:
-        st.metric("Na fila", len(waiting))
-    with c2:
-        st.metric("Status", "Em atendimento" if current else "Aguardando")
-    with c3:
-        st.metric("Atualizado", datetime.now().strftime("%H:%M:%S"))
-    st.info("Para testar o som, abra esta tela e permita áudio no navegador. A fala automática pode ser bloqueada até a primeira interação do usuário.")
-    st.caption("Esta tela atualiza automaticamente a cada 2,5 segundos.")
+
+    @st.fragment(run_every="2s")
+    def renderizar_painel_tv():
+        # Consultar novamente os dados a cada atualização
+        current = get_current()
+        waiting = get_waiting()
+
+        st.markdown(
+            '<div class="panel" style="text-align:center;padding:36px 24px">'
+            '<div class="kicker">Atenção • Próximo atendimento</div>',
+            unsafe_allow_html=True
+        )
+
+        if current:
+            patient_name = html.escape(current["patient_name"])
+            registration = html.escape(current["registration"])
+            room = html.escape(current["room"])
+            called_at = html.escape(current["called_at"] or "—")
+
+            st.markdown(
+                f'<div class="big-name" style="margin-top:20px">{patient_name}</div>',
+                unsafe_allow_html=True
+            )
+
+            st.markdown(
+                f'<div class="big-reg">Matrícula: <b>{registration}</b></div>',
+                unsafe_allow_html=True
+            )
+
+            st.markdown(
+                f'<div style="display:inline-block;margin-top:20px;'
+                f'background:#e8f4ff;color:#15517b;border-radius:999px;'
+                f'padding:12px 22px;font-size:20px;font-weight:800">'
+                f'➡️ {room}</div>',
+                unsafe_allow_html=True
+            )
+
+            st.markdown(
+                f'<p class="muted" style="margin-top:18px">'
+                f'Chamado às {called_at}</p>',
+                unsafe_allow_html=True
+            )
+
+            # Reproduzir o som apenas quando houver uma nova chamada
+            # ou quando a hora da chamada mudar (ex.: rechamada).
+            event_key = f'{current["id"]}:{current["called_at"] or ""}'
+            last_event = st.session_state.get("tv_last_sound_event")
+
+            if event_key != last_event:
+                sound_widget(
+                    current["id"],
+                    current["patient_name"],
+                    current["registration"],
+                    current["room"]
+                )
+                st.session_state["tv_last_sound_event"] = event_key
+
+        else:
+            st.markdown(
+                '<div class="big-name" style="margin-top:24px">'
+                'Aguardando chamada…</div>'
+                '<p class="muted">O próximo paciente aparecerá aqui.</p>',
+                unsafe_allow_html=True
+            )
+
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        c1, c2, c3 = st.columns(3)
+
+        with c1:
+            st.metric("Na fila", len(waiting))
+
+        with c2:
+            st.metric(
+                "Status",
+                "Em atendimento" if current else "Aguardando"
+            )
+
+        with c3:
+            st.metric("Atualizado", datetime.now().strftime("%H:%M:%S"))
+
+        st.caption("Painel sincronizado automaticamente a cada 2 segundos.")
+
+    renderizar_painel_tv()
 
 else:
-    st.markdown('<div class="panel"><div class="kicker">Histórico recente</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="panel"><div class="kicker">Histórico recente</div>',
+        unsafe_allow_html=True
+    )
     recent = get_recent(30)
+
     if recent:
         import pandas as pd
+
         df = pd.DataFrame([{
             "Paciente": r["patient_name"],
             "Matrícula": r["registration"],
@@ -270,16 +338,34 @@ else:
             "Entrada na fila": r["created_at"],
             "Hora da chamada": r["called_at"] or "—",
         } for r in recent])
+
         st.dataframe(df, use_container_width=True, hide_index=True)
     else:
         st.info("Ainda não há atendimentos no histórico.")
+
     st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('<div class="panel"><div class="kicker">Configurações de demonstração</div><p class="muted">A limpeza apaga a fila e o histórico deste banco de teste.</p>', unsafe_allow_html=True)
-    confirm = st.checkbox("Confirmo que quero apagar todos os dados de demonstração")
+
+    st.markdown(
+        '<div class="panel"><div class="kicker">Configurações de demonstração</div>'
+        '<p class="muted">A limpeza apaga a fila e o histórico deste banco de teste.</p>',
+        unsafe_allow_html=True
+    )
+
+    confirm = st.checkbox(
+        "Confirmo que quero apagar todos os dados de demonstração"
+    )
+
     if st.button("🗑️ Limpar dados de teste", disabled=not confirm):
         reset_demo()
         st.success("Dados de demonstração removidos.")
         st.rerun()
+
     st.markdown('</div>', unsafe_allow_html=True)
 
-st.markdown('<div style="text-align:center;color:#94a3b8;font-size:12px;padding:18px 0">Chama Clínica • Protótipo para testes • Não usar para dados reais de saúde</div>', unsafe_allow_html=True)
+st.markdown(
+    '<div style="text-align:center;color:#94a3b8;font-size:12px;padding:18px 0">'
+    'Chama Clínica • Protótipo para testes • Não usar para dados reais de saúde'
+    '</div>',
+    unsafe_allow_html=True
+)
+
