@@ -1,0 +1,11 @@
+{
+  "name": "chama-clinica-frontend",
+  "private": true,
+  "scripts": {
+    "build": "tailwindcss -c tailwind.config.js -i src/styles.css -o ../static/css/app.css --minify",
+    "watch": "tailwindcss -c tailwind.config.js -i src/styles.css -o ../static/css/app.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}

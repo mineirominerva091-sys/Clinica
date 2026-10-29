@@ -1,0 +1,50 @@
+{% from "_icons.html" import icon %}<!doctype html>
+<html lang="pt-BR">
+<head>
+  {% include "_base_head.html" %}
+  <meta name="theme-color" content="#060f24">
+  <title>Chama Clínica — TV</title>
+</head>
+<body class="tv-bg min-h-screen text-white">
+  <main class="mx-auto flex min-h-screen w-[94vw] max-w-[1600px] flex-col py-[clamp(18px,3.5vw,52px)]" style="gap:clamp(16px,2.6vw,34px)">
+    <header class="flex items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <span class="grid h-[clamp(40px,4.4vw,64px)] w-[clamp(40px,4.4vw,64px)] place-items-center rounded-2xl bg-accent-400 text-brand-950">{{ icon('bell-ring', 'h-[55%] w-[55%]') }}</span>
+        <div>
+          <div class="font-display font-extrabold tracking-tight" style="font-size:clamp(20px,2.6vw,38px)">Chama Clínica</div>
+          <div class="font-medium text-brand-200" style="font-size:clamp(12px,1.4vw,19px)">Serviço médico</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="hidden text-right sm:block">
+          <div id="tv-clock" class="font-display font-extrabold tabular-nums" style="font-size:clamp(20px,2.6vw,38px)">--:--</div>
+          <div id="tv-date" class="font-medium capitalize text-brand-200" style="font-size:clamp(11px,1.2vw,16px)"></div>
+        </div>
+        <button id="sound-button" class="tv-btn" type="button"><span data-ico>{{ icon('volume-x', 'h-4 w-4') }}</span><span data-label>Ativar som</span></button>
+        <button id="fullscreen-button" class="tv-btn" type="button">{{ icon('maximize', 'h-4 w-4') }}<span class="hidden md:inline">Tela cheia</span></button>
+      </div>
+    </header>
+
+    <section id="call-card" class="tv-card waiting" aria-live="polite">
+      <div id="tv-bell" class="bell-wrap idle">{{ icon('bell-ring', '') }}</div>
+      <div id="tv-label" class="tv-label">Aguardando chamada</div>
+      <div id="tv-name" class="tv-name">Nenhum paciente<br class="sm:hidden"> no momento</div>
+      <div id="tv-room" class="tv-room hidden">{{ icon('door-open', 'h-[.8em] w-[.8em]') }}<span data-text></span></div>
+      <div id="tv-registration" class="tv-meta hidden"></div>
+      <div id="tv-called" class="tv-meta" style="margin-top:1vh;font-weight:500;color:#8593b0"></div>
+    </section>
+
+    <section class="grid grid-cols-3 gap-3 sm:gap-4">
+      <div class="tv-metric"><span>Na fila</span><strong id="tv-queue">0</strong></div>
+      <div class="tv-metric"><span>Status</span><strong id="tv-status">Aguardando</strong></div>
+      <div class="tv-metric"><span>Última atualização</span><strong id="tv-updated" class="tabular-nums">—</strong></div>
+    </section>
+
+    <p id="tv-message" class="flex items-center justify-center gap-2 text-center text-sm font-medium text-brand-300">
+      <span id="tv-conn" class="live-dot"></span><span data-text>Atualização automática a cada 2 segundos</span>
+    </p>
+  </main>
+  <script src="{{ url_for('static', filename='js/icons.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/tv.js') }}" defer></script>
+</body>
+</html>

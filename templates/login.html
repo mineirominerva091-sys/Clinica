@@ -1,0 +1,70 @@
+{% from "_icons.html" import icon %}<!doctype html>
+<html lang="pt-BR">
+<head>
+  {% include "_base_head.html" %}
+  <meta name="theme-color" content="#1b3169">
+  <title>Entrar — Chama Clínica</title>
+</head>
+<body class="page-bg min-h-screen">
+  <main class="mx-auto grid min-h-screen max-w-6xl items-center p-4 lg:grid-cols-2 lg:gap-0 lg:p-8">
+    <!-- Painel de marca -->
+    <aside class="auth-side relative hidden h-full min-h-[560px] flex-col justify-between overflow-hidden rounded-l-[2rem] p-12 text-white lg:flex">
+      <div class="flex items-center gap-3">
+        <span class="grid h-11 w-11 place-items-center rounded-xl bg-accent-400 text-brand-950">{{ icon('bell-ring', 'h-6 w-6') }}</span>
+        <span class="font-display text-lg font-extrabold tracking-tight">Chama Clínica</span>
+      </div>
+      <div>
+        <h2 class="font-display text-4xl font-extrabold leading-[1.1] tracking-tight">Atendimento organizado,<br>sala de espera tranquila.</h2>
+        <p class="mt-4 max-w-sm text-[15px] leading-relaxed text-brand-200">Gerencie a fila, chame pacientes e veja tudo aparecer na TV em tempo real.</p>
+        <ul class="mt-8 space-y-3 text-sm font-medium text-brand-100">
+          <li class="flex items-center gap-3"><span class="grid h-8 w-8 place-items-center rounded-lg bg-white/10">{{ icon('users', 'h-4 w-4') }}</span>Fila de espera em tempo real</li>
+          <li class="flex items-center gap-3"><span class="grid h-8 w-8 place-items-center rounded-lg bg-white/10">{{ icon('volume-2', 'h-4 w-4') }}</span>Chamada com aviso sonoro e voz</li>
+          <li class="flex items-center gap-3"><span class="grid h-8 w-8 place-items-center rounded-lg bg-white/10">{{ icon('shield-check', 'h-4 w-4') }}</span>Acesso protegido por senha</li>
+        </ul>
+      </div>
+      <p class="text-xs text-brand-300">Serviço médico</p>
+    </aside>
+
+    <!-- Formulário -->
+    <section class="mx-auto w-full max-w-md animate-fade-up rounded-3xl bg-white p-8 shadow-lift ring-1 ring-brand-900/5 sm:p-10 lg:max-w-none lg:rounded-l-none lg:rounded-r-[2rem] lg:p-14">
+      <div class="mb-8 flex items-center gap-3 lg:hidden">
+        <span class="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-b from-brand-500 to-brand-700 text-white shadow-glow">{{ icon('bell-ring', 'h-6 w-6') }}</span>
+        <span class="font-display text-lg font-extrabold tracking-tight">Chama Clínica</span>
+      </div>
+      <p class="eyebrow">Painel da médica</p>
+      <h1 class="mt-2 font-display text-3xl font-extrabold tracking-tight">Bem-vinda de volta</h1>
+      <p class="mt-2 text-[15px] text-ink-500">Digite a senha de acesso para abrir o painel de atendimento.</p>
+
+      {% if error %}
+      <div class="mt-6 flex items-start gap-3 rounded-xl bg-rose-50 p-3.5 text-sm font-semibold text-rose-700 ring-1 ring-inset ring-rose-100" role="alert">
+        {{ icon('circle-x', 'mt-0.5 h-5 w-5 shrink-0') }}<span>{{ error }}</span>
+      </div>
+      {% endif %}
+
+      <form method="post" autocomplete="off" class="mt-7 space-y-5">
+        <label class="field" for="password">Senha
+          <div class="relative">
+            <input id="password" name="password" type="password" required autofocus class="input pr-12" placeholder="••••••••">
+            <button type="button" id="toggle-password" class="absolute right-2 top-1/2 mt-[3px] grid h-9 w-9 -translate-y-1/2 place-items-center rounded-lg text-ink-400 transition hover:bg-slate-100 hover:text-ink-700" aria-label="Mostrar senha">
+              <span data-eye>{{ icon('eye', 'h-5 w-5') }}</span><span data-eye-off hidden>{{ icon('eye-off', 'h-5 w-5') }}</span>
+            </button>
+          </div>
+        </label>
+        <button class="btn-primary w-full" type="submit">Entrar no painel {{ icon('arrow-right', 'h-4 w-4') }}</button>
+      </form>
+    </section>
+  </main>
+  <script>
+    (function () {
+      var btn = document.getElementById('toggle-password'), input = document.getElementById('password');
+      btn.addEventListener('click', function () {
+        var show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.querySelector('[data-eye]').hidden = show;
+        btn.querySelector('[data-eye-off]').hidden = !show;
+        btn.setAttribute('aria-label', show ? 'Ocultar senha' : 'Mostrar senha');
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{% from "_icons.html" import icon %}<!doctype html>
+<html lang="pt-BR">
+<head>
+  {% include "_base_head.html" %}
+  <meta name="theme-color" content="#060f24">
+  <title>TV — Chama Clínica</title>
+</head>
+<body class="tv-bg grid min-h-screen place-items-center p-6 text-white">
+  <main class="w-full max-w-md animate-fade-up rounded-3xl bg-white/[.06] p-10 text-center ring-1 ring-white/10">
+    <span class="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-accent-400 text-brand-950">{{ icon('lock', 'h-8 w-8') }}</span>
+    <h1 class="mt-6 font-display text-2xl font-extrabold tracking-tight">TV não autorizada</h1>
+    <p class="mt-3 text-[15px] leading-relaxed text-brand-200">Abra o endereço da TV com o token configurado pelo administrador.</p>
+    <p class="mt-6 rounded-xl bg-black/25 px-4 py-3 font-mono text-xs text-brand-300">/tv?token=SEU_TOKEN</p>
+  </main>
+</body>
+</html>
